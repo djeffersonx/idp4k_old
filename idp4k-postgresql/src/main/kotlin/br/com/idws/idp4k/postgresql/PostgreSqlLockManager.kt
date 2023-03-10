@@ -1,4 +1,4 @@
-package br.com.idws.idp4k.test
+package br.com.idws.idp4k.postgresql
 
 import br.com.idws.idp4k.core.manager.LockManager
 import br.com.idws.idp4k.core.manager.exception.LockInvalidStateException
@@ -39,7 +39,7 @@ class PostgreSqlLockManager(
         findForUpdateBy(lock.key, lock.group)?.let { persistedLock ->
 
             require(persistedLock.isLocked()) {
-                throw LockInvalidStateException(persistedLock.key, persistedLock.state, "release")
+                throw LockInvalidStateException.onRelease(persistedLock.key, persistedLock.state)
             }
             updateStatus(lock.copy(state = lockState))
 
@@ -99,6 +99,4 @@ class PostgreSqlLockManager(
                 set status = ? where "key" = ? and "group" = ?"""
 
     }
-
-
 }

@@ -1,6 +1,6 @@
 package br.com.idws.idp4k.spring.postgresql
 
-import br.com.idws.idp4k.test.PostgreSqlLockManager
+import br.com.idws.idp4k.postgresql.PostgreSqlLockManager
 import br.com.idws.idp4k.test.integration.factory.LockManagerDefaultIntegrationTests
 import container.PostgreSQLDatabaseExtension
 import org.junit.jupiter.api.TestFactory
@@ -14,9 +14,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 class PostgreSQLIntegrationTests {
 
     @Autowired
-    private lateinit var postgreSQLLockManager: PostgreSqlLockManager
+    private lateinit var postgreSqlLockManager: PostgreSqlLockManager
 
     @TestFactory
-    fun integrationTests() = LockManagerDefaultIntegrationTests.create(postgreSQLLockManager)
+    fun integrationTests() = LockManagerDefaultIntegrationTests.create(postgreSqlLockManager)
 
 }
