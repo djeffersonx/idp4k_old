@@ -11,7 +11,7 @@ import java.util.UUID
 
 object ReleaseLockProcess {
 
-    fun `it don't accept release unlocked lock`(lockManager: LockManager) = DynamicTest.dynamicTest(
+    fun `given a relase call it don't accept release unlocked lock`(lockManager: LockManager) = DynamicTest.dynamicTest(
         "it don't accept release unlocked lock"
     ) {
         val key = UUID.randomUUID().toString()

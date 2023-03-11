@@ -11,7 +11,7 @@ import java.util.UUID
 
 
 object LockProcess {
-    fun `it don't lock when is already locked`(lockManager: LockManager) =
+    fun `given a lock call it don't lock when is already locked`(lockManager: LockManager) =
         DynamicTest.dynamicTest(
             "it don't lock when is already locked"
         ) {
@@ -27,7 +27,7 @@ object LockProcess {
             }
         }
 
-    fun `it don't lock when is in success state`(lockManager: LockManager) =
+    fun `given a lock call it don't lock when is in success state`(lockManager: LockManager) =
         DynamicTest.dynamicTest(
             "it don't lock when is on success state"
         ) {
@@ -43,7 +43,7 @@ object LockProcess {
             }
         }
 
-    fun `it don't lock when is in failed state`(lockManager: LockManager) =
+    fun `given a lock call it don't lock when is in failed state`(lockManager: LockManager) =
         DynamicTest.dynamicTest(
             "it don't lock when is in failed state"
         ) {

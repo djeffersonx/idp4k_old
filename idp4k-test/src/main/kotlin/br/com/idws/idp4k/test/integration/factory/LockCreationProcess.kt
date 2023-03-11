@@ -8,7 +8,7 @@ import java.util.UUID
 
 object LockCreationProcess {
 
-    fun `it create a new lock as pending`(lockManager: LockManager) =
+    fun `given getOrCreate call it create a new lock as pending`(lockManager: LockManager) =
         DynamicTest.dynamicTest(
             "it create a new lock as pending"
         ) {
@@ -20,7 +20,7 @@ object LockCreationProcess {
 
         }
 
-    fun `it return a persisted lock`(lockManager: LockManager) =
+    fun `given getOrCreate call it return a persisted lock`(lockManager: LockManager) =
         DynamicTest.dynamicTest(
             "it return a persisted lock"
         ) {
