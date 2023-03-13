@@ -17,6 +17,7 @@ import java.util.UUID
 
 @SpringBootTest
 @ExtendWith(value = [SpringExtension::class, PostgreSQLDatabaseExtension::class])
+@DisplayName("Idp4k aspect oriented programming integration tests")
 class Id4kAopIntegrationTest {
 
     @Autowired

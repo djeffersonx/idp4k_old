@@ -23,7 +23,7 @@ dependencies {
 
     implementation(project(":idp4k-core"))
     implementation(project(":idp4k-spring"))
-    implementation(project(":idp4k-postgresql"))
+    implementation(project(":idp4k-lm-postgresql"))
 
     implementation("org.springframework.boot:spring-boot-starter")
     implementation("org.springframework.boot:spring-boot-starter-aop")
