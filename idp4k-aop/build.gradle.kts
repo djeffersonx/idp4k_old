@@ -1,19 +1,9 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
     id("org.springframework.boot") version "2.7.9"
     id("io.spring.dependency-management") version "1.0.15.RELEASE"
-    kotlin("jvm") version "1.8.10"
+    kotlin("jvm")
 
     kotlin("plugin.spring") version "1.6.21"
-}
-
-group = "br.com.idws"
-version = "0.0.1-SNAPSHOT"
-java.sourceCompatibility = JavaVersion.VERSION_17
-
-repositories {
-    mavenCentral()
 }
 
 sourceSets {
@@ -22,6 +12,7 @@ sourceSets {
         runtimeClasspath += sourceSets.main.get().output
     }
 }
+
 val integrationTestImplementation by configurations.getting {
     extendsFrom(configurations.implementation.get())
     extendsFrom(configurations.testImplementation.get())
@@ -69,15 +60,4 @@ val integrationTest = task<Test>("integrationTest") {
     testLogging {
         events("passed")
     }
-}
-
-tasks.withType<KotlinCompile> {
-    kotlinOptions {
-        freeCompilerArgs = listOf("-Xjsr305=strict")
-        jvmTarget = "17"
-    }
-}
-
-tasks.withType<Test> {
-    useJUnitPlatform()
 }
