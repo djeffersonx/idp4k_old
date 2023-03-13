@@ -25,10 +25,10 @@ class TransferService {
 ### About the annotation:
 
 ```kotlin
-    @IdempotenceConfig(
+    @IdempotentResource(
         key = "#{key}", 
         group= "transfer",
-        onAlreadyExecutedFunction = "onAlreadyExecutedFunction"
+        make = "onAlreadyExecutedFunction"
     )
 ```
 #### Annotation properties:
