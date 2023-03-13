@@ -24,7 +24,7 @@ class IdempotentBuilder<R>(
     fun build() = Idempotent(key, group, main, make, acceptRetry, returnType)
 }
 
-inline fun <reified R> Idempotent(
+inline fun <reified R> IdempotentProcess(
     key: String,
     group: String, builder: IdempotentBuilder<R>.() -> Unit
 ) = IdempotentBuilder(key, group, R::class.java).apply(builder).build()

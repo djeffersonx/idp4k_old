@@ -1,6 +1,6 @@
 package br.com.idws.idp4k.test.integration.factory
 
-import br.com.idws.idp4k.core.dsl.Idempotent
+import br.com.idws.idp4k.core.dsl.IdempotentProcess
 import br.com.idws.idp4k.core.manager.IdempotenceManager
 import br.com.idws.idp4k.core.manager.LockManager
 import br.com.idws.idp4k.test.doInMultipleThreads
@@ -18,7 +18,7 @@ object IdempotenceProcessing {
             val idempotenceManager = IdempotenceManager(lockManager)
             val key = UUID.randomUUID().toString()
 
-            val process = Idempotent(key, "test") {
+            val process = IdempotentProcess(key, "test") {
                 main { "onFirstExecutionFunction" }
                 make { "onAlreadyExecutedFunction" }
             }
@@ -37,12 +37,12 @@ object IdempotenceProcessing {
         val firstKey = UUID.randomUUID().toString()
         val secondKey = UUID.randomUUID().toString()
 
-        val firstExecutionResponse = idempotenceManager.execute(Idempotent(firstKey, "test") {
+        val firstExecutionResponse = idempotenceManager.execute(IdempotentProcess(firstKey, "test") {
             main { "onFirstExecutionFunction" }
             make { "onAlreadyExecutedFunction" }
         })
 
-        val secondExecutionResponse = idempotenceManager.execute(Idempotent(secondKey, "test") {
+        val secondExecutionResponse = idempotenceManager.execute(IdempotentProcess(secondKey, "test") {
             main { "onFirstExecutionFunction" }
             make { "onAlreadyExecutedFunction" }
         })

@@ -1,6 +1,6 @@
 package br.com.idws.idp4k.core.manager
 
-import br.com.idws.idp4k.core.dsl.Idempotent
+import br.com.idws.idp4k.core.dsl.IdempotentProcess
 import br.com.idws.idp4k.core.manager.exception.AlreadyProcessedException
 import br.com.idws.idp4k.core.manager.exception.AlreadyProcessedWithErrorException
 import br.com.idws.idp4k.core.manager.exception.BeingProcessedException
@@ -22,7 +22,7 @@ import java.util.UUID
 class IdempotenceManagerTest {
 
     @Nested
-    @DisplayName("given idempotent process have make function and doesn't have response storage")
+    @DisplayName("given the idempotent process have make function and doesn't have response storage")
     inner class WithMakeFunctionAndWithoutResponseStorage {
 
         private val lockManager = mockk<LockManager>()
@@ -32,7 +32,7 @@ class IdempotenceManagerTest {
         fun `it call main function when lock is on PENDING state`() {
             val key = UUID.randomUUID().toString()
             val group = "test"
-            val idempotent = Idempotent(key, group) {
+            val idempotent = IdempotentProcess(key, group) {
                 main { "mainResponse" }
                 make { "idempotentResponse" }
             }
@@ -55,7 +55,7 @@ class IdempotenceManagerTest {
         fun `it call absolute function when lock is on SUCCESS state`() {
             val key = UUID.randomUUID().toString()
             val group = "test"
-            val idempotent = Idempotent(key, group) {
+            val idempotent = IdempotentProcess(key, group) {
                 main { "mainResponse" }
                 make { "idempotentResponse" }
             }
@@ -75,7 +75,7 @@ class IdempotenceManagerTest {
         fun `it release the lock as PENDING when idempotent process accept retry`() {
             val key = UUID.randomUUID().toString()
             val group = "test"
-            val idempotent = Idempotent(key, group) {
+            val idempotent = IdempotentProcess(key, group) {
                 acceptRetry(true)
                 main { throw Exception("Error processing the main function") }
                 make { "idempotentResponse" }
@@ -98,7 +98,7 @@ class IdempotenceManagerTest {
         fun `it release the lock as FAILED when idempotent process doesn't accepts retry`() {
             val key = UUID.randomUUID().toString()
             val group = "test"
-            val idempotent = Idempotent(key, group) {
+            val idempotent = IdempotentProcess(key, group) {
                 acceptRetry(false)
                 main { throw Exception("Error processing the main function") }
                 make { "idempotentResponse" }
@@ -122,7 +122,7 @@ class IdempotenceManagerTest {
         fun `it throw AlreadyProcessedWithErrorException when lock is on FAILED state`() {
             val key = UUID.randomUUID().toString()
             val group = "test"
-            val idempotent = Idempotent(key, group) {
+            val idempotent = IdempotentProcess(key, group) {
                 acceptRetry(false)
                 main { throw Exception("Error processing the main function") }
                 make { "idempotentResponse" }
@@ -142,7 +142,7 @@ class IdempotenceManagerTest {
         fun `it throw BeingProcessedException when lock is on LOCKED state`() {
             val key = UUID.randomUUID().toString()
             val group = "test"
-            val idempotent = Idempotent(key, group) {
+            val idempotent = IdempotentProcess(key, group) {
                 acceptRetry(false)
                 main { throw Exception("Error processing the main function") }
                 make { "idempotentResponse" }
@@ -160,7 +160,7 @@ class IdempotenceManagerTest {
     }
 
     @Nested
-    @DisplayName("given idempotent process doesn't have make function and have response storage")
+    @DisplayName("given the idempotent process doesn't have make function and have response storage")
     inner class WithoutMakeFunctionWithResponseStorage {
 
         private val lockManager = mockk<LockManager>()
@@ -174,7 +174,7 @@ class IdempotenceManagerTest {
             fun `it call idempotence maker when doesn't have make function on idempotence definition`() {
                 val key = UUID.randomUUID().toString()
                 val group = "test"
-                val idempotent = Idempotent(key, group) {
+                val idempotent = IdempotentProcess(key, group) {
                     main { "mainResponse" }
                 }
 
@@ -199,28 +199,32 @@ class IdempotenceManagerTest {
                 }
             }
         }
-
     }
 
-    @Test
-    fun `it throw AlreadyProcessedException when doesn't have make function and idempotence maker`() {
+    @Nested
+    @DisplayName("given the idempotent process doesn't have make function and response storage")
+    inner class WithoutMakeFunctionAndResponseStorage {
 
         val lockManager = mockk<LockManager>()
         val idempotenceManager = IdempotenceManager(lockManager)
 
-        val key = UUID.randomUUID().toString()
-        val group = "test"
-        val idempotent = Idempotent(key, group) {
-            main { "mainResponse" }
+        @Test
+        fun `it throw AlreadyProcessedException when doesn't have make function and idempotence maker`() {
+
+            val key = UUID.randomUUID().toString()
+            val group = "test"
+            val idempotent = IdempotentProcess(key, group) {
+                main { "mainResponse" }
+            }
+
+            val lockSucceeded = IdempotenceLock.of(idempotent.key, idempotent.group).succeeded()
+            every { lockManager.getOrCreate(lockSucceeded.key, idempotent.group) } returns lockSucceeded
+
+            invoking { idempotenceManager.execute(idempotent) } shouldThrow AlreadyProcessedException::class with {
+                message == "The process with key: $key was already processed with error"
+            }
         }
-
-        val lockSucceeded = IdempotenceLock.of(idempotent.key, idempotent.group).succeeded()
-        every { lockManager.getOrCreate(lockSucceeded.key, idempotent.group) } returns lockSucceeded
-
-        invoking { idempotenceManager.execute(idempotent) } shouldThrow AlreadyProcessedException::class with {
-            message == "The process with key: $key was already processed with error"
-        }
-
     }
+
 
 }

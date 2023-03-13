@@ -1,6 +1,6 @@
 package br.com.idws.idp4k.spring.aop
 
-import br.com.idws.idp4k.core.dsl.Idempotent
+import br.com.idws.idp4k.core.dsl.IdempotentProcess
 import br.com.idws.idp4k.core.infrastructure.logger
 import br.com.idws.idp4k.core.manager.IdempotenceManager
 import br.com.idws.idp4k.core.manager.exception.AlreadyProcessedException
@@ -29,7 +29,7 @@ class IdempotenceAdvice(
         logger().info("Using idempotence group: $group")
 
         return idempotenceManager.execute(
-            Idempotent(key, group) {
+            IdempotentProcess(key, group) {
                 main { joinPoint.proceed() }
                 make {
                     if (idempotentResource.make.isEmpty()) {
