@@ -4,6 +4,7 @@ import br.com.idws.idp4k.core.dsl.IdempotentProcess
 import br.com.idws.idp4k.core.manager.exception.AlreadyProcessedException
 import br.com.idws.idp4k.core.manager.exception.AlreadyProcessedWithErrorException
 import br.com.idws.idp4k.core.manager.exception.BeingProcessedException
+import br.com.idws.idp4k.core.manager.exception.ResponseStorageHasNoResponseStoredException
 import br.com.idws.idp4k.core.model.IdempotenceLock
 import br.com.idws.idp4k.core.model.LockState
 import io.mockk.every
@@ -17,6 +18,7 @@ import org.amshove.kluent.with
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import java.lang.IllegalArgumentException
 import java.util.UUID
 
 class IdempotenceManagerTest {
@@ -167,36 +169,65 @@ class IdempotenceManagerTest {
         private val responseStorage = mockk<ResponseStorage>()
         private val idempotenceManager = IdempotenceManager(lockManager, responseStorage)
 
-        @Nested
-        inner class IdempotenceMaker {
+        @Test
+        fun `it call response storage when doesn't have make function on idempotent process`() {
+            val key = UUID.randomUUID().toString()
+            val group = "test"
+            val idempotent = IdempotentProcess(key, group) {
+                main { "mainResponse" }
+            }
 
-            @Test
-            fun `it call idempotence maker when doesn't have make function on idempotence definition`() {
-                val key = UUID.randomUUID().toString()
-                val group = "test"
-                val idempotent = IdempotentProcess(key, group) {
-                    main { "mainResponse" }
-                }
+            val lockSucceeded = IdempotenceLock.of(idempotent.key, idempotent.group).succeeded()
+            every { lockManager.getOrCreate(lockSucceeded.key, idempotent.group) } returns lockSucceeded
+            every {
+                responseStorage.get(
+                    String::class.java,
+                    idempotent.key,
+                    idempotent.group
+                )
+            } returns "mainResponse"
 
-                val lockSucceeded = IdempotenceLock.of(idempotent.key, idempotent.group).succeeded()
-                every { lockManager.getOrCreate(lockSucceeded.key, idempotent.group) } returns lockSucceeded
-                every {
-                    responseStorage.get(
-                        String::class.java,
-                        idempotent.key,
-                        idempotent.group
-                    )
-                } returns "mainResponse"
+            idempotenceManager.execute(idempotent)
 
+            verify {
+                responseStorage.get(
+                    String::class.java,
+                    idempotent.key,
+                    idempotent.group
+                )
+            }
+        }
+
+        @Test
+        fun `it throw ResponseStorageHasNoResponseStoredException when storage returns null`() {
+            val key = UUID.randomUUID().toString()
+            val group = "test"
+            val idempotent = IdempotentProcess(key, group) {
+                main { "mainResponse" }
+            }
+
+            val lockSucceeded = IdempotenceLock.of(idempotent.key, idempotent.group).succeeded()
+            every { lockManager.getOrCreate(lockSucceeded.key, idempotent.group) } returns lockSucceeded
+            every {
+                responseStorage.get(
+                    String::class.java,
+                    idempotent.key,
+                    idempotent.group
+                )
+            } returns null
+
+            invoking {
                 idempotenceManager.execute(idempotent)
+            } shouldThrow ResponseStorageHasNoResponseStoredException::class with {
+                message == "The response storage has no response stored to key: $key and group: $group was already processed"
+            }
 
-                verify {
-                    responseStorage.get(
-                        String::class.java,
-                        idempotent.key,
-                        idempotent.group
-                    )
-                }
+            verify {
+                responseStorage.get(
+                    String::class.java,
+                    idempotent.key,
+                    idempotent.group
+                )
             }
         }
     }
@@ -226,5 +257,31 @@ class IdempotenceManagerTest {
         }
     }
 
+    @Nested
+    @DisplayName("given the IdempotentProcess have a make function and idempotent manager has a ResponseStorage")
+    inner class WithMakeFunctionAndResponseStorage {
+
+        val lockManager = mockk<LockManager>()
+        val responseStorage = mockk<ResponseStorage>()
+        val idempotenceManager = IdempotenceManager(lockManager, responseStorage)
+
+        @Test
+        fun `it throw AlreadyProcessedException when doesn't have make function and idempotence maker`() {
+
+            val key = UUID.randomUUID().toString()
+            val group = "test"
+            val idempotent = IdempotentProcess(key, group) {
+                main { "mainResponse" }
+                make { "idempotentResponse" }
+            }
+
+            invoking { idempotenceManager.execute(idempotent) } shouldThrow IllegalArgumentException::class with {
+                message == """You can't execute a IdempotentProcess with 'make' function and a implementation of ResponseStorage. 
+                        You should decide between:
+                        - Pass idempotent process with make function
+                        - Use a IdempotentManager with a implementation of ResponseStorage"""
+            }
+        }
+    }
 
 }

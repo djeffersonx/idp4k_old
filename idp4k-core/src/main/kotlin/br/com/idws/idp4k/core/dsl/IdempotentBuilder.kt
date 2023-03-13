@@ -21,7 +21,7 @@ class IdempotentBuilder<R>(
         this.acceptRetry = acceptRetry
     }
 
-    fun build() = Idempotent(key, group, main, make, acceptRetry, returnType)
+    fun build() = IdempotentProcess(key, group, main, make, acceptRetry, returnType)
 }
 
 inline fun <reified R> IdempotentProcess(

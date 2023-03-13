@@ -2,7 +2,7 @@ package br.com.idws.idp4k.core.dsl
 
 import br.com.idws.idp4k.core.model.LockState
 
-data class Idempotent<R>(
+data class IdempotentProcess<R>(
     val key: String,
     val group: String,
     val main: () -> R,
