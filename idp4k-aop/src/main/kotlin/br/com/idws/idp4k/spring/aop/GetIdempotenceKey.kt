@@ -1,7 +1,7 @@
 package br.com.idws.idp4k.spring.aop
 
 import br.com.idws.idp4k.spring.aop.spel.ExpressionResolver
-import br.com.idws.idp4k.spring.aop.annotation.IdempotenceConfig
+import br.com.idws.idp4k.spring.aop.annotation.IdempotentResource
 import org.aspectj.lang.ProceedingJoinPoint
 import org.aspectj.lang.annotation.Aspect
 import org.springframework.stereotype.Component
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component
 class GetIdempotenceKey {
 
     operator fun invoke(joinPoint: ProceedingJoinPoint): String {
-        val idempotenceConfig = joinPoint.getIdempotenceAnnotation()
+        val idempotenceConfig = joinPoint.getIdempotentResourceAnnotation()
         return idempotenceConfig.key.takeIf { it.isNotBlank() }
             ?.let {
                 evaluateKeyExpression(idempotenceConfig, joinPoint)
@@ -19,9 +19,9 @@ class GetIdempotenceKey {
     }
 
     private fun evaluateKeyExpression(
-        idempotenceConfig: IdempotenceConfig,
+        idempotentResource: IdempotentResource,
         joinPoint: ProceedingJoinPoint
-    ) = ExpressionResolver.evaluateToString(idempotenceConfig.key, joinPoint.methodParametersToVarsMap())
+    ) = ExpressionResolver.evaluateToString(idempotentResource.key, joinPoint.methodParametersToVarsMap())
 
     private fun generateIdempotenceKey(joinPoint: ProceedingJoinPoint) =
         joinPoint.args

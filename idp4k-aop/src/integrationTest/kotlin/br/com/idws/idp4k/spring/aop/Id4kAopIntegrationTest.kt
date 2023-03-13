@@ -39,7 +39,7 @@ class Id4kAopIntegrationTest {
 
             `should transfer with success`(key, from, to, amount)
             `should deny the transfer`(key, from, to, amount)
-            `persisted lock should be on state`(key, "TransferService", LockState.SUCCEEDED)
+            `persisted lock should be on state`(key, "TransferService:transfer", LockState.SUCCEEDED)
         }
 
 //    }
@@ -60,8 +60,8 @@ class Id4kAopIntegrationTest {
 
             `should transfer with success`(keyFirstProcess, from, to, amount)
             `should transfer with success`(keySecondProcess, from, to, amount)
-            `persisted lock should be on state`(keyFirstProcess, "TransferService", LockState.SUCCEEDED)
-            `persisted lock should be on state`(keySecondProcess, "TransferService", LockState.SUCCEEDED)
+            `persisted lock should be on state`(keyFirstProcess, "TransferService:transfer", LockState.SUCCEEDED)
+            `persisted lock should be on state`(keySecondProcess, "TransferService:transfer", LockState.SUCCEEDED)
         }
 
 

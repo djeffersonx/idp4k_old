@@ -17,10 +17,10 @@ class IdempotenceAdvice(
     private val getIdempotenceGroup: GetIdempotenceGroup
 ) {
 
-    @Around("@annotation(br.com.idws.idp4k.spring.aop.annotation.IdempotenceConfig)")
+    @Around("@annotation(br.com.idws.idp4k.spring.aop.annotation.IdempotentResource)")
     fun handle(joinPoint: ProceedingJoinPoint): Any {
 
-        val idempotenceConfig = joinPoint.getIdempotenceAnnotation()
+        val idempotentResource = joinPoint.getIdempotentResourceAnnotation()
 
         val key = getIdempotenceKey(joinPoint)
         val group = getIdempotenceGroup(joinPoint)
@@ -31,11 +31,11 @@ class IdempotenceAdvice(
         return idempotenceManager.execute(
             Idempotent(key, group) {
                 main { joinPoint.proceed() }
-                absolute {
-                    if (idempotenceConfig.onAlreadyExecutedFunction.isEmpty()) {
+                make {
+                    if (idempotentResource.make.isEmpty()) {
                         throw AlreadyProcessedException(key)
                     }
-                    joinPoint.invokeMethodOnTargetClass(idempotenceConfig.onAlreadyExecutedFunction)
+                    joinPoint.invokeMethodOnTargetClass(idempotentResource.make)
                 }
             })
 

@@ -5,9 +5,10 @@ import br.com.idws.idp4k.core.model.LockState
 data class Idempotent<R>(
     val key: String,
     val group: String,
-    val onFirstExecution: () -> R,
-    val onAlreadyExecuted: () -> R,
-    val acceptRetry: Boolean
+    val main: () -> R,
+    val make: (() -> R)?,
+    val acceptRetry: Boolean,
+    val resultType: Class<R>
 ) {
     fun getLockStatusOnError() = if (acceptRetry) {
         LockState.PENDING

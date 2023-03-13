@@ -20,7 +20,7 @@ object IdempotenceProcessing {
 
             val process = Idempotent(key, "test") {
                 main { "onFirstExecutionFunction" }
-                absolute { "onAlreadyExecutedFunction" }
+                make { "onAlreadyExecutedFunction" }
             }
 
             val responses = doInMultipleThreads(50) {
@@ -39,12 +39,12 @@ object IdempotenceProcessing {
 
         val firstExecutionResponse = idempotenceManager.execute(Idempotent(firstKey, "test") {
             main { "onFirstExecutionFunction" }
-            absolute { "onAlreadyExecutedFunction" }
+            make { "onAlreadyExecutedFunction" }
         })
 
         val secondExecutionResponse = idempotenceManager.execute(Idempotent(secondKey, "test") {
             main { "onFirstExecutionFunction" }
-            absolute { "onAlreadyExecutedFunction" }
+            make { "onAlreadyExecutedFunction" }
         })
 
         firstExecutionResponse shouldBeEqualTo "onFirstExecutionFunction"

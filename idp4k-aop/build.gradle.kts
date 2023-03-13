@@ -56,7 +56,6 @@ dependencies {
 
 }
 
-
 val integrationTest = task<Test>("integrationTest") {
     description = "Runs integration tests."
     group = "verification"

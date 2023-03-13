@@ -1,14 +1,13 @@
 package br.com.idws.idp4k.spring.aop
 
-import br.com.idws.idp4k.spring.aop.annotation.IdempotenceConfig
-import org.springframework.boot.ansi.AnsiColors.BitDepth
+import br.com.idws.idp4k.spring.aop.annotation.IdempotentResource
 import org.springframework.stereotype.Component
 import java.math.BigDecimal
 
 @Component
 class TransferService {
 
-    @IdempotenceConfig(key = "#{key}", onAlreadyExecutedFunction = "onAlreadyExecutedFunction")
+    @IdempotentResource(key = "#{key}", make = "onAlreadyExecutedFunction")
     fun transfer(key: String, from: String, to: String, amount: BigDecimal): String {
         return "Transferred $amount from: $from to: $to with success"
     }

@@ -2,13 +2,15 @@ package br.com.idws.idp4k.core.manager
 
 import br.com.idws.idp4k.core.dsl.Idempotent
 import br.com.idws.idp4k.core.infrastructure.logger
+import br.com.idws.idp4k.core.manager.exception.AlreadyProcessedException
 import br.com.idws.idp4k.core.manager.exception.AlreadyProcessedWithErrorException
 import br.com.idws.idp4k.core.manager.exception.BeingProcessedException
 import br.com.idws.idp4k.core.model.IdempotenceLock
 import br.com.idws.idp4k.core.model.LockState
 
 class IdempotenceManager(
-    private val lockManager: LockManager
+    private val lockManager: LockManager,
+    private val responseStorage: ResponseStorage? = null
 ) {
 
     fun <R> execute(idempotent: Idempotent<R>): R {
@@ -30,7 +32,15 @@ class IdempotenceManager(
                 throw AlreadyProcessedWithErrorException(idempotent.key)
             }
 
-            LockState.SUCCEEDED -> idempotent.onAlreadyExecuted()
+            LockState.SUCCEEDED -> {
+                idempotent.make?.invoke()
+                    ?: responseStorage?.get(
+                        idempotent.resultType,
+                        idempotent.key,
+                        idempotent.group
+                    )
+                    ?: throw AlreadyProcessedException(idempotent.key)
+            }
         }
     }
 
@@ -38,7 +48,7 @@ class IdempotenceManager(
         lock: IdempotenceLock,
         idempotent: Idempotent<R>
     ) = try {
-        idempotent.onFirstExecution()
+        idempotent.main()
             .also {
                 logger().info("[${idempotent.key}] - Main function executed with success")
                 lockManager.release(lock, LockState.SUCCEEDED)

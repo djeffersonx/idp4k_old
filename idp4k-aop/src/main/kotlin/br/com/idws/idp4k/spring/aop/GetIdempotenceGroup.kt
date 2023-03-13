@@ -1,7 +1,7 @@
 package br.com.idws.idp4k.spring.aop
 
 import br.com.idws.idp4k.spring.aop.spel.ExpressionResolver
-import br.com.idws.idp4k.spring.aop.annotation.IdempotenceConfig
+import br.com.idws.idp4k.spring.aop.annotation.IdempotentResource
 import org.aspectj.lang.ProceedingJoinPoint
 import org.springframework.stereotype.Component
 
@@ -10,7 +10,7 @@ class GetIdempotenceGroup {
 
     operator fun invoke(joinPoint: ProceedingJoinPoint): String {
 
-        val idempotenceConfig = joinPoint.getIdempotenceAnnotation()
+        val idempotenceConfig = joinPoint.getIdempotentResourceAnnotation()
 
         return idempotenceConfig.group.takeIf { it.isNotBlank() }
             ?.let {
@@ -19,10 +19,11 @@ class GetIdempotenceGroup {
     }
 
     private fun evaluateGroupExpression(
-        idempotenceConfig: IdempotenceConfig,
+        idempotentResource: IdempotentResource,
         joinPoint: ProceedingJoinPoint
-    ) = ExpressionResolver.evaluateToString(idempotenceConfig.group, joinPoint.methodParametersToVarsMap())
+    ) = ExpressionResolver.evaluateToString(idempotentResource.group, joinPoint.methodParametersToVarsMap())
 
-    private fun generateIdempotenceGroup(joinPoint: ProceedingJoinPoint): String = joinPoint.target.javaClass.simpleName
+    private fun generateIdempotenceGroup(joinPoint: ProceedingJoinPoint): String =
+        "${joinPoint.target.javaClass.simpleName}:${joinPoint.methodSignature().method.name}"
 
 }

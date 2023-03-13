@@ -1,29 +1,30 @@
 package br.com.idws.idp4k.core.dsl
 
 class IdempotentBuilder<R>(
-    val key: String,
-    val group: String
+    private val key: String,
+    private val group: String,
+    private val returnType: Class<R>
 ) {
     private lateinit var main: () -> R
-    private lateinit var absolute: () -> R
+    private var make: (() -> R)? = null
     private var acceptRetry: Boolean = false
 
     fun main(main: () -> R) {
         this.main = main
     }
 
-    fun absolute(absolute: () -> R) {
-        this.absolute = absolute
+    fun make(make: () -> R) {
+        this.make = make
     }
 
     fun acceptRetry(acceptRetry: Boolean) {
         this.acceptRetry = acceptRetry
     }
 
-    fun build() = Idempotent(key, group, main, absolute, acceptRetry)
+    fun build() = Idempotent(key, group, main, make, acceptRetry, returnType)
 }
 
-fun <R> Idempotent(
+inline fun <reified R> Idempotent(
     key: String,
     group: String, builder: IdempotentBuilder<R>.() -> Unit
-) = IdempotentBuilder<R>(key, group).apply(builder).build()
+) = IdempotentBuilder(key, group, R::class.java).apply(builder).build()
