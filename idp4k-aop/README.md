@@ -10,7 +10,7 @@ In this example below we are defining an Idempotent process, using the `@Idempot
 @Component
 class TransferService {
 
-    @IdempotenceConfig(key = "#{key}", onAlreadyExecutedFunction = "onAlreadyExecutedFunction")
+    @IdempotentResource(key = "#{key}", make = "onAlreadyExecutedFunction")
     fun transfer(key: String, from: String, to: String, amount: BigDecimal): String {
         return "Transferred $amount from: $from to: $to with success"
     }
