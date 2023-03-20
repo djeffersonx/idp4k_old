@@ -23,7 +23,7 @@ class PostgreSqlResponseStorage(
         }
         jdbcTemplate
             .update(
-                """INSERT INTO idp4j_response_storage ("key", "group", json_value) VALUES (?,?,?)""",
+                """INSERT INTO idp4k_response_storage ("key", "group", json_value) VALUES (?,?,?)""",
                 key,
                 group,
                 PGobject().apply {
@@ -36,7 +36,7 @@ class PostgreSqlResponseStorage(
     override fun <T> get(type: Class<T>, key: String, group: String): T? {
         val response = jdbcTemplate
             .query(
-                """SELECT "key", "group", json_value FROM idp4j_response_storage WHERE "key" = ? and "group" = ?""",
+                """SELECT "key", "group", json_value FROM idp4k_response_storage WHERE "key" = ? and "group" = ?""",
                 rowMapper(),
                 key,
                 group

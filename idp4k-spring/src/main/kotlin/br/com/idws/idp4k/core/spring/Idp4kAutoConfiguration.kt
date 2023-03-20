@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration
 
 @Configuration
 @ConditionalOnMissingBean(IdempotenceManager::class)
-class Idp4jAutoConfiguration {
+class Idp4kAutoConfiguration {
 
     @Bean
     fun idempotenceManager(

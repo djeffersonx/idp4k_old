@@ -1,4 +1,4 @@
-package br.com.idws.idp4k.test.integration.factory
+package br.com.idws.idp4k.test.integration.factory.lockmanager
 
 import br.com.idws.idp4k.core.dsl.IdempotentProcess
 import br.com.idws.idp4k.core.manager.IdempotenceManager

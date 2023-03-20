@@ -1,4 +1,4 @@
-create table idp4j_response_storage (
+create table idp4k_response_storage (
     "key" varchar(64) not null,
     "group" varchar(64) not null,
     "json_value" jsonb not null,0

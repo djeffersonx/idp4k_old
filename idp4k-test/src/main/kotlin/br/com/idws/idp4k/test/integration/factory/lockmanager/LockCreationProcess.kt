@@ -1,4 +1,4 @@
-package br.com.idws.idp4k.test.integration.factory
+package br.com.idws.idp4k.test.integration.factory.lockmanager
 
 import br.com.idws.idp4k.core.manager.LockManager
 import br.com.idws.idp4k.core.model.LockState

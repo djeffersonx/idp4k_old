@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-br.com.idws.idp4k.core.spring.Idp4jAutoConfiguration
+br.com.idws.idp4k.core.spring.Idp4kAutoConfiguration

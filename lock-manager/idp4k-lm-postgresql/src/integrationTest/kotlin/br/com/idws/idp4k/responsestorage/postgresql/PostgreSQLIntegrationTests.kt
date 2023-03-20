@@ -1,6 +1,6 @@
 package br.com.idws.idp4k.responsestorage.postgresql
 
-import br.com.idws.idp4k.test.integration.factory.LockManagerDefaultIntegrationTests
+import br.com.idws.idp4k.test.integration.factory.lockmanager.LockManagerDefaultIntegrationTests
 import container.PostgreSQLDatabaseExtension
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.TestFactory
